@@ -104,6 +104,7 @@ struct Proxy
     String ServerName;
 
     String Auth;
+    String Ports;
     String Alpn;
     String UpMbps;
     String DownMbps;
