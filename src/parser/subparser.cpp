@@ -79,9 +79,10 @@ void hysteriaConstruct(Proxy &node, const std::string &group, const std::string 
     node.FakeType = type;
 }
 
-void hysteria2Construct(Proxy &node, const std::string &group, const std::string &remarks, const std::string &add, const std::string &port, const std::string &password, const std::string &host, const std::string &up, const std::string &down, const std::string &alpn, const std::string &obfsParam, const std::string &obfsPassword, tribool udp, tribool tfo, tribool scv)
+void hysteria2Construct(Proxy &node, const std::string &group, const std::string &remarks, const std::string &add, const std::string &port, const std::string &ports, const std::string &password, const std::string &host, const std::string &up, const std::string &down, const std::string &alpn, const std::string &obfsParam, const std::string &obfsPassword, tribool udp, tribool tfo, tribool scv)
 {
     commonConstruct(node, ProxyType::Hysteria2, group, remarks, add, port, udp, tfo, scv, tribool());
+    node.Ports = ports;
     node.Password = password;
     node.Host = (host.empty() && !isIPv4(add) && !isIPv6(add)) ? add.data() : trim(host);
     node.UpMbps = up;
@@ -1375,6 +1376,7 @@ void explodeClash(Node yamlnode, std::vector<Proxy> &nodes)
             break;
         case "hysteria2"_hash:
             group = HYSTERIA2_DEFAULT_GROUP;
+            singleproxy["ports"] >>= ports;
             singleproxy["password"] >>= password;
             singleproxy["up"] >>= up;
             singleproxy["down"] >>= down;
@@ -1384,7 +1386,7 @@ void explodeClash(Node yamlnode, std::vector<Proxy> &nodes)
             singleproxy["alpn"][0] >>= alpn;
 
             scv = singleproxy["insecure"].IsDefined() ? singleproxy["insecure"].as<std::string>() == "1" : false;
-            hysteria2Construct(node, group, ps, server, port, password, host, up, down, alpn, obfsParam, obfsPassword, udp, tfo, scv);
+            hysteria2Construct(node, group, ps, server, port, ports, password, host, up, down, alpn, obfsParam, obfsPassword, udp, tfo, scv);
             break;
         case "tuic"_hash:
             group = TUIC_DEFAULT_GROUP;
@@ -1495,7 +1497,7 @@ void explodeStdHysteria(std::string hysteria, Proxy &node)
 
 void explodeStdHysteria2(std::string hysteria2, Proxy &node)
 {
-    std::string add, port, password, host, up, down, alpn, obfsParam, obfsPassword, remarks;
+    std::string add, port, ports, password, host, up, down, alpn, obfsParam, obfsPassword, remarks;
     std::string addition;
     tribool scv;
     hysteria2 = hysteria2.substr(12);
@@ -1534,6 +1536,7 @@ void explodeStdHysteria2(std::string hysteria2, Proxy &node)
     }
 
     scv = getUrlArg(addition, "insecure");
+    ports = getUrlArg(addition,"ports");
     up = getUrlArg(addition,"up");
     down = getUrlArg(addition,"down");
     alpn = getUrlArg(addition,"alpn");
@@ -1544,7 +1547,7 @@ void explodeStdHysteria2(std::string hysteria2, Proxy &node)
     if(remarks.empty())
         remarks = add + ":" + port;
 
-    hysteria2Construct(node, HYSTERIA2_DEFAULT_GROUP, remarks, add, port, password, host, up, down, alpn, obfsParam, obfsPassword, tribool(), tribool(), scv);
+    hysteria2Construct(node, HYSTERIA2_DEFAULT_GROUP, remarks, add, port, ports, password, host, up, down, alpn, obfsParam, obfsPassword, tribool(), tribool(), scv);
     return;
 }
 
