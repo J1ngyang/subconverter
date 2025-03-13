@@ -10,7 +10,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  REGISTRY_IMAGE: ghcr.io/J1ngyang/subconverter
+  REGISTRY_IMAGE: ghcr.io/j1ngyang/subconverter
 
 jobs:
   build:
